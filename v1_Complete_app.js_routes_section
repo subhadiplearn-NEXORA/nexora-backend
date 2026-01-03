@@ -1,0 +1,29 @@
+// PRODUCT ROUTES
+app.post('/api/products', protect, authorize('seller'), productController.createProduct);
+app.put('/api/products/:id', protect, authorize('seller'), productController. updateProduct);
+app.get('/api/products/my', protect, authorize('seller'), productController.listSellerProducts);
+app.get('/api/products/all', protect, authorize('admin'), productController.listAllProducts);
+app.patch('/api/products/:id/status', protect, authorize('admin'), productController.toggleProductStatus);
+app.delete('/api/products/:id', protect, authorize('admin'), productController.deleteProduct);
+app.get('/api/products/active', productController.listActiveProducts);
+app.get('/api/products/: id', productController.getProduct);
+
+// ORDER ROUTES
+app.post('/api/orders', protect, authorize('customer'), orderController.placeOrder);
+app.get('/api/orders/my', protect, authorize('customer'), orderController.listCustomerOrders);
+app.get('/api/orders/seller', protect, authorize('seller'), orderController.listSellerOrders);
+app.patch('/api/orders/:id/status', protect, authorize('seller', 'admin'), orderController.updateOrderStatus);
+app.get('/api/orders', protect, authorize('admin'), orderController.listAllOrders);
+app.get('/api/orders/: id', protect, orderController.getOrder);
+
+// PAYMENT ROUTES
+app.post('/api/payments', protect, paymentController.createPayment);
+app.post('/api/payments/verify', protect, paymentController.verifyPayment);
+app.get('/api/payments/:id', protect, paymentController.getPayment);
+
+// SETTLEMENT ROUTES
+app. post('/api/settlements', protect, authorize('admin'), settlementController.createSettlement);
+app.get('/api/settlements', protect, authorize('admin'), settlementController.listSettlements);
+app.patch('/api/settlements/:id/pay', protect, authorize('admin'), settlementController.markAsPaid);
+app.get('/api/seller/earnings', protect, authorize('seller'), settlementController.getSellerEarnings);
+app.get('/api/settlements/: id', protect, settlementController. getSettlementDetails);
