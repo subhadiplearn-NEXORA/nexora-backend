@@ -2,6 +2,8 @@
  * src/app.js
  * Express app configuration, middlewares, route registration, versioning, error handling
  */
+require('dotenv').config();
+
 const express = require('express');
 const helmet = require('helmet');
 const compression = require('compression');
@@ -27,10 +29,10 @@ if (process.env.NODE_ENV === 'production') {
   app.use(morgan('dev'));
 }
 
-// Rate limiter (basic)
+// Rate limiter
 const apiLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
-  max: 150, // per IP
+  windowMs: 1 * 60 * 1000,
+  max: 150,
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -47,14 +49,14 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/health', (req, res) =>
-  res.status(200).json({ success: true, message: 'NEXORA API is healthy', env: process.env.NODE_ENV })
+  res.status(200).json({ success: true, message: 'NEXORA API is healthy' })
 );
 
 app.get('/api/v1/health', (req, res) =>
-  res.status(200).json({ success: true, message: 'NEXORA API v1 is healthy', env: process.env.NODE_ENV })
+  res.status(200).json({ success: true, message: 'NEXORA API v1 is healthy' })
 );
 
-// Route registrations (import routers)
+// Routes
 const authRoutes = require('./routes/auth.routes');
 const sellerRoutes = require('./routes/seller.routes');
 const productRoutes = require('./routes/product.routes');
@@ -62,7 +64,6 @@ const orderRoutes = require('./routes/order.routes');
 const paymentRoutes = require('./routes/payment.routes');
 const adminRoutes = require('./routes/admin.routes');
 
-// Mount legacy and versioned
 const API_BASE = '/api';
 const API_V1 = '/api/v1';
 
@@ -85,12 +86,15 @@ app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: 'Route not found',
-    path: req.originalUrl,
-    method: req.method,
   });
 });
 
 // Error handler
 app.use(errorHandler);
 
-module.exports = app;
+// 🔥 THIS IS THE IMPORTANT PART (NEW)
+const PORT = process.env.PORT || 10000;
+
+app.listen(PORT, () => {
+  console.log(🚀 NEXORA backend running on port ${PORT});
+});
