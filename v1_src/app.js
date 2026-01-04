@@ -1,6 +1,6 @@
 /**
  * src/app.js
- * Express app configuration, middlewares, route registration, versioning, error handling
+ * Express app configuration
  */
 
 require("dotenv").config();
@@ -28,17 +28,13 @@ app.use(express.urlencoded({ extended: true }));
 /* ===============================
    LOGGING
 ================================ */
-if (process.env.NODE_ENV === "production") {
-  app.use(morgan("combined"));
-} else {
-  app.use(morgan("dev"));
-}
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
 /* ===============================
    RATE LIMITING
 ================================ */
 const apiLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000,
+  windowMs: 60 * 1000,
   max: 150,
   standardHeaders: true,
   legacyHeaders: false,
@@ -47,81 +43,51 @@ const apiLimiter = rateLimit({
 app.use("/api", apiLimiter);
 
 /* ===============================
-   HEALTH CHECK ROUTES
+   HEALTH ROUTES
 ================================ */
 app.get("/", (req, res) => {
-  res.status(200).json({
+  res.json({
     success: true,
     message: "NEXORA backend running 🚀",
     environment: process.env.NODE_ENV || "development",
-    timestamp: new Date().toISOString(),
   });
 });
 
 app.get("/api/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "NEXORA API is healthy",
-  });
+  res.json({ success: true, message: "API healthy" });
 });
 
 app.get("/api/v1/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "NEXORA API v1 is healthy",
-  });
+  res.json({ success: true, message: "API v1 healthy" });
 });
 
 /* ===============================
-   ROUTES
-   (ONLY ENABLE IF FILES EXIST)
+   ROUTES (ENABLE ONLY IF EXISTS)
 ================================ */
-const authRoutes = require("./routes/auth.routes");
-const sellerRoutes = require("./routes/seller.routes");
-const productRoutes = require("./routes/product.routes");
-const orderRoutes = require("./routes/order.routes");
-const paymentRoutes = require("./routes/payment.routes");
-const adminRoutes = require("./routes/admin.routes");
+app.use("/api", require("./routes/auth.routes"));
+app.use("/api", require("./routes/seller.routes"));
+app.use("/api", require("./routes/product.routes"));
+app.use("/api", require("./routes/order.routes"));
+app.use("/api", require("./routes/payment.routes"));
+app.use("/api", require("./routes/admin.routes"));
 
-const API_BASE = "/api";
-const API_V1 = "/api/v1";
-
-app.use(API_BASE, authRoutes);
-app.use(API_BASE, sellerRoutes);
-app.use(API_BASE, productRoutes);
-app.use(API_BASE, orderRoutes);
-app.use(API_BASE, paymentRoutes);
-app.use(API_BASE, adminRoutes);
-
-app.use(API_V1, authRoutes);
-app.use(API_V1, sellerRoutes);
-app.use(API_V1, productRoutes);
-app.use(API_V1, orderRoutes);
-app.use(API_V1, paymentRoutes);
-app.use(API_V1, adminRoutes);
+app.use("/api/v1", require("./routes/auth.routes"));
+app.use("/api/v1", require("./routes/seller.routes"));
+app.use("/api/v1", require("./routes/product.routes"));
+app.use("/api/v1", require("./routes/order.routes"));
+app.use("/api/v1", require("./routes/payment.routes"));
+app.use("/api/v1", require("./routes/admin.routes"));
 
 /* ===============================
-   404 HANDLER
+   404
 ================================ */
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-  });
+  res.status(404).json({ success: false, message: "Route not found" });
 });
 
 /* ===============================
-   GLOBAL ERROR HANDLER
+   ERROR HANDLER
 ================================ */
 app.use(errorHandler);
-
-/* ===============================
-   SERVER START (RENDER SAFE)
-================================ */
-const PORT = process.env.PORT || 10000;
-
-app.listen(PORT, () => {
-  console.log(🚀 NEXORA backend running on port ${PORT});
-});
 
 module.exports = app;
