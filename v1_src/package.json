@@ -1,5 +1,5 @@
 {
-  "name": "nexora-backend-v1",
+  "name": "nexora-backend",
   "version": "1.0.0",
   "private": true,
   "main": "server.js",
@@ -8,5 +8,10 @@
   },
   "engines": {
     "node": ">=16"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
   }
 }
