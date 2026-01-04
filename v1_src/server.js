@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 /* ===============================
-   BASIC HEALTH CHECK (IMPORTANT)
+   BASIC HEALTH CHECK
 ================================ */
 app.get("/", (req, res) => {
   res.json({
@@ -23,14 +23,6 @@ app.get("/", (req, res) => {
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
-
-/* ===============================
-   ROUTES
-   (enable only if files exist)
-================================ */
-// Example:
-// const paymentRoutes = require("./routes/payment.routes");
-// app.use("/api/payments", paymentRoutes);
 
 /* ===============================
    SERVER START
